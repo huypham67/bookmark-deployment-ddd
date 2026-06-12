@@ -1,0 +1,66 @@
+# Secrets & Environment
+.env
+.env.*.local
+.env.production
+.env.development
+.env.staging
+!.env.*.example
+
+# Keys & Certificates
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+id_rsa
+id_dsa
+known_hosts
+
+# Credentials
+credentials.json
+secrets.json
+secrets/
+
+# Data & Logs
+data/
+db_data/
+*_db_data/
+redis_data/
+logs/
+*.log
+
+# Backups (DB dumps) — but keep the postgres init scripts
+backups/
+*.sql
+!postgres/init/*.sql
+
+# Temporary Files
+*.tmp
+*.temp
+*.cache
+*.pid
+*.bak
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE & Editors
+.idea/
+.vscode/
+*.iml
+
+# Docker Local overrides
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Whitelisted Files
+!.env.example
+!.env.*.example
+!docker-compose.yaml
+!docker-compose.yml
+!nginx/nginx.conf
+!Makefile
+!README.md
