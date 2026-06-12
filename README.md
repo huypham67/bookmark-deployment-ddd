@@ -24,7 +24,7 @@ Deployment orchestration for the **bookmark microservices** stack. Adapted from 
 - **Database-per-service**: `user-db` (→ `user_db`) and `bookmark-db` (→ `bookmark_db`) are separate Postgres instances. No cross-service foreign keys.
 - **Shared Redis**: rate limiting for both services; cache + short-links for bookmark-service. Services use separate logical DB indexes (user=0, bookmark=1).
 - **Self-migrating**: each service runs its own migrations on startup — no init scripts needed.
-- **JWT**: `user-service` signs tokens; `bookmark-service` validates them. A **single shared keypair** in `./keys` is mounted into both (the shared JWT provider loads both keys). `JWT_ISSUER`/`JWT_AUDIENCE` are identical across both services.
+- **JWT**: `user-service` is the issuer — it holds the **private key** and signs tokens. `bookmark-service` is a relying party — it loads **only the public key** and validates. The keypair lives in `./keys`; user-service mounts the whole dir, bookmark-service mounts only `public.pem`, so the signing key never reaches the verifier. `JWT_ISSUER`/`JWT_AUDIENCE` are identical across both services.
 
 ## Services
 
@@ -75,7 +75,7 @@ Real `.env` files are git-ignored; commit only the `*.example` templates.
 | `user-service/.env` | user-service app config (DB=user-db, Redis DB 0, JWT issuer/audience) |
 | `bookmark-service/.env` | bookmark-service app config (DB=bookmark-db, Redis DB 1, same JWT issuer/audience) |
 | `config/cloudflared.env` | `TUNNEL_TOKEN` |
-| `keys/` | shared JWT keypair (mounted read-only into both services) |
+| `keys/` | JWT keypair. user-service (issuer) mounts the whole dir; bookmark-service (verifier) mounts **only** `public.pem` |
 
 ## Make Targets
 
