@@ -10,7 +10,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5435:5432"
     networks:
       bookmark-network:
         aliases:
@@ -39,7 +39,7 @@ services:
 
   user-service:
     image: huypham053/user-service:${USER_SERVICE_TAG:-latest}
-    container_name: user-service
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,7 +55,6 @@ services:
 
   bookmark-service:
     image: huypham053/bookmark-service:${BOOKMARK_SERVICE_TAG:-latest}
-    container_name: bookmark-service
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,9 +68,8 @@ services:
       - ./keys/public.pem:/app/keys/public.pem:ro
     restart: unless-stopped
 
-  portal:
+  bookmark-portal:
     image: ebvn/bookmark-app-portal:ddd
-    container_name: bookmark-portal
     depends_on:
       - user-service
       - bookmark-service
@@ -79,15 +77,12 @@ services:
       - bookmark-network
     restart: unless-stopped
 
-  nginx:
+  bookmark-nginx:
     image: nginx:alpine
-    container_name: bookmark-nginx
     depends_on:
       - user-service
       - bookmark-service
-      - portal
-    ports:
-      - "80:80"
+      - bookmark-portal
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
@@ -96,7 +91,6 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    container_name: bookmark-cloudflared
     env_file:
       - ./config/cloudflared.env
     command: tunnel --no-autoupdate --protocol http2 run
