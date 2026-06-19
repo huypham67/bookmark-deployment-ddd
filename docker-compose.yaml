@@ -68,6 +68,19 @@ services:
       - ./keys/public.pem:/app/keys/public.pem:ro
     restart: unless-stopped
 
+  bookmark-worker:
+    image: huypham053/bookmark-worker:${BOOKMARK_WORKER_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - bookmark-worker/.env
+    networks:
+      - bookmark-network
+    restart: unless-stopped
+
   bookmark-portal:
     image: ebvn/bookmark-app-portal:ddd
     depends_on:
